@@ -20,16 +20,16 @@ import {
 } from "../src/lib/constants";
 import { buildReflectionPrompt, hashReflectionPrompt } from "../src/lib/reflection";
 import {
-  agentReflectionAttributes,
-  createAgentReflectionPayload,
-  createModifierStackPayload,
+  agentInsightAttributes,
+  createAgentInsightPayload,
+  createMemoryContextPayload,
   createMemoryNodePayload,
-  isAgentReflectionPayload,
+  isAgentInsightPayload,
   isMemoryNodePayload,
-  isModifierStackPayload,
+  isMemoryContextPayload,
   memoryNodeAttributes,
   modifierAttributeKey,
-  modifierStackAttributes,
+  memoryContextAttributes,
 } from "../src/lib/schema";
 
 config({ path: ".env.local" });
@@ -80,7 +80,7 @@ async function main() {
     throw new Error("Braga readback payload did not match the MemoryNode schema.");
   }
 
-  const stackPayload = createModifierStackPayload({
+  const contextPayload = createMemoryContextPayload({
     memoryKey,
     modifiers: DEMO_MODIFIERS,
     interpreter: DEMO_INTERPRETER,
@@ -88,19 +88,19 @@ async function main() {
     authority: DEMO_AUTHORITY,
   });
 
-  const { entityKey: modifierStackKey, txHash: modifierStackTxHash } =
+  const { entityKey: memoryContextKey, txHash: memoryContextTxHash } =
     await walletClient.createEntity({
-      payload: jsonToPayload(stackPayload),
+      payload: jsonToPayload(contextPayload),
       contentType: "application/json",
-      attributes: modifierStackAttributes(stackPayload),
+      attributes: memoryContextAttributes(contextPayload),
       expiresIn: DEFAULT_ENTITY_TTL_SECONDS,
     });
 
-  const stackEntity = await publicClient.getEntity(modifierStackKey);
-  const storedStackPayload = stackEntity.toJson();
+  const contextEntity = await publicClient.getEntity(memoryContextKey);
+  const storedContextPayload = contextEntity.toJson();
 
-  if (!isModifierStackPayload(storedStackPayload)) {
-    throw new Error("Braga readback payload did not match the ModifierStack schema.");
+  if (!isMemoryContextPayload(storedContextPayload)) {
+    throw new Error("Braga readback payload did not match the MemoryContext schema.");
   }
 
   const reflectionPrompt = buildReflectionPrompt({
@@ -111,10 +111,10 @@ async function main() {
     authority: DEMO_AUTHORITY,
     priorReflections: [],
   });
-  const reflectionPayload = createAgentReflectionPayload({
+  const insightPayload = createAgentInsightPayload({
     memoryKey,
-    modifierStackKey,
-    reflection:
+    memoryContextKey,
+    insight:
       "The user's memory prefers contradiction mapping before commitment, so future agents should preserve ambiguity until a stable pattern appears.",
     model: "braga-smoke-local",
     interpreter: DEMO_INTERPRETER,
@@ -124,19 +124,19 @@ async function main() {
     lineageDepth: 0,
   });
 
-  const { entityKey: reflectionKey, txHash: reflectionTxHash } =
+  const { entityKey: insightKey, txHash: insightTxHash } =
     await walletClient.createEntity({
-      payload: jsonToPayload(reflectionPayload),
+      payload: jsonToPayload(insightPayload),
       contentType: "application/json",
-      attributes: agentReflectionAttributes(reflectionPayload),
+      attributes: agentInsightAttributes(insightPayload),
       expiresIn: DEFAULT_ENTITY_TTL_SECONDS,
     });
 
-  const reflectionEntity = await publicClient.getEntity(reflectionKey);
-  const storedReflectionPayload = reflectionEntity.toJson();
+  const insightEntity = await publicClient.getEntity(insightKey);
+  const storedInsightPayload = insightEntity.toJson();
 
-  if (!isAgentReflectionPayload(storedReflectionPayload)) {
-    throw new Error("Braga readback payload did not match the AgentReflection schema.");
+  if (!isAgentInsightPayload(storedInsightPayload)) {
+    throw new Error("Braga readback payload did not match the AgentInsight schema.");
   }
 
   const memoryQueryResult = await publicClient
@@ -176,22 +176,22 @@ async function main() {
     .limit(10)
     .fetch();
 
-  const foundCreatedStack = modifierQueryResult.entities.some((resultEntity) => {
-    return resultEntity.key.toLowerCase() === modifierStackKey.toLowerCase();
+  const foundCreatedContext = modifierQueryResult.entities.some((resultEntity) => {
+    return resultEntity.key.toLowerCase() === memoryContextKey.toLowerCase();
   });
 
-  if (!foundCreatedStack) {
-    throw new Error("Braga modifier query did not return the ModifierStack just created.");
+  if (!foundCreatedContext) {
+    throw new Error("Braga modifier query did not return the MemoryContext just created.");
   }
 
-  const reflectionQueryResult = await publicClient
+  const insightQueryResult = await publicClient
     .buildQuery()
     .where([
       eq("project", PROJECT_ATTRIBUTE),
       eq("schemaVersion", SCHEMA_VERSION),
-      eq("entityType", "AgentReflection"),
+      eq("entityType", "AgentInsight"),
       eq("memoryKey", memoryKey),
-      eq("modifierStackKey", modifierStackKey),
+      eq("memoryContextKey", memoryContextKey),
       eq("interpreter", DEMO_INTERPRETER),
     ])
     .withPayload()
@@ -200,12 +200,12 @@ async function main() {
     .limit(10)
     .fetch();
 
-  const foundCreatedReflection = reflectionQueryResult.entities.some((resultEntity) => {
-    return resultEntity.key.toLowerCase() === reflectionKey.toLowerCase();
+  const foundCreatedInsight = insightQueryResult.entities.some((resultEntity) => {
+    return resultEntity.key.toLowerCase() === insightKey.toLowerCase();
   });
 
-  if (!foundCreatedReflection) {
-    throw new Error("Braga reflection query did not return the AgentReflection just created.");
+  if (!foundCreatedInsight) {
+    throw new Error("Braga insight query did not return the AgentInsight just created.");
   }
 
   console.log(
@@ -217,14 +217,14 @@ async function main() {
         creator: memoryEntity.creator,
         memoryKey,
         memoryTxHash,
-        modifierStackKey,
-        modifierStackTxHash,
-        reflectionKey,
-        reflectionTxHash,
+        memoryContextKey,
+        memoryContextTxHash,
+        insightKey,
+        insightTxHash,
         modifierQuery: "route:private-reasoning",
         queriedMemories: memoryQueryResult.entities.length,
-        queriedModifierStacks: modifierQueryResult.entities.length,
-        queriedReflections: reflectionQueryResult.entities.length,
+        queriedMemoryContexts: modifierQueryResult.entities.length,
+        queriedInsights: insightQueryResult.entities.length,
       },
       null,
       2,
