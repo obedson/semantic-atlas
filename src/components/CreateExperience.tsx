@@ -646,7 +646,7 @@ export function CreateExperience() {
                 <EntityMeta record={result.memoryRecord} txHash={result.memoryTx} />
               </div>
             ) : null}
-            {result?.stackRecord ? (
+            {result?.contextRecord ? (
               <div>
                 <h3 className="mb-2 text-xs font-extrabold uppercase tracking-widest text-slate-400">
                   MemoryContext
