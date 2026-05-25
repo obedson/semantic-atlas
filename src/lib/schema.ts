@@ -337,3 +337,5 @@ export const isModifierStackPayload = isMemoryContextPayload;
 export const isAgentReflectionPayload = isAgentInsightPayload;
 export const agentReflectionAttributes = agentInsightAttributes;
 export const modifierStackAttributes = memoryContextAttributes;
+export const createAgentReflectionPayload = createAgentInsightPayload;
+export const createModifierStackPayload = createMemoryContextPayload;
