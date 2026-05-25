@@ -167,11 +167,6 @@ export function CreateExperience() {
     }
   }
 
-  // Advanced states setup
-  const [interpreter, setInterpreter] = useState(DEMO_INTERPRETER);
-  const [context, setContext] = useState(DEMO_CONTEXT);
-  const [authority, setAuthority] = useState(DEMO_AUTHORITY);
-
   // Security mode computed state
   const activeSecurityMode =
     contentMode === "plaintext" && visibility === "public"
