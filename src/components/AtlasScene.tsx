@@ -230,7 +230,7 @@ export function AtlasScene() {
                   createdAt: new Date().toISOString(),
                 },
               }}
-              stacks={[
+              contexts={[
                 {
                   key: "demo-stack-key",
                   payload: {
@@ -245,15 +245,15 @@ export function AtlasScene() {
                   },
                 },
               ]}
-              reflections={[
+              insights={[
                 {
                   key: "demo-ref-key",
                   payload: {
                     entityType: "AgentInsight",
                     project: PROJECT_ATTRIBUTE,
                     memoryKey: "demo-node-key",
-                    modifierStackKey: "demo-stack-key",
-                    reflection: "Cognitive status: Ambiguity preserved correctly.",
+                    memoryContextKey: "demo-stack-key",
+                    insight: "Cognitive status: Ambiguity preserved correctly.",
                     model: "groq-llama-3.1",
                     createdAt: new Date().toISOString(),
                   },
@@ -347,8 +347,8 @@ export function AtlasScene() {
 
                 <MemoryGraph
                   memory={graphData.memory}
-                  stacks={graphData.stacks}
-                  reflections={graphData.reflections}
+                  contexts={graphData.contexts}
+                  insights={graphData.insights}
                 />
               </div>
             ) : (
