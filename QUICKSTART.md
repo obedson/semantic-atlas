@@ -91,5 +91,3 @@ npm run build
 - Verify environment variables are set
 
 ---
-
-**You're ready to go!** 🚀
