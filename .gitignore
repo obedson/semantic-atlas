@@ -10,3 +10,22 @@ scratch/
 .idea/
 *.log
 tsconfig.tsbuildinfo
+
+# Error logs and test files
+er.md
+*.tmp
+*.bak
+
+# Environment examples (keep the .example versions)
+.env.coding-ai.example
+
+# OS files
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Build artifacts
+dist/
+build/
+coverage/

@@ -10,7 +10,10 @@
     "test:local": "tsx scripts/local-smoke.ts",
     "test:braga": "tsx scripts/braga-test.ts",
     "seed:demo": "tsx scripts/seed-demo.ts",
-    "verify": "npm run lint && npm run test:local && npm run build"
+    "verify": "npm run lint && npm run test:local && npm run build",
+    "memory": "node cli/memory-cli.js",
+    "memory:hook": "node cli/memory-cli.js hook",
+    "memory:unhook": "node cli/memory-cli.js unhook"
   },
   "dependencies": {
     "@arkiv-network/sdk": "^0.6.8",
