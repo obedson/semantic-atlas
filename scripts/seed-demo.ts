@@ -12,12 +12,12 @@ import {
 } from "../src/lib/constants";
 import { buildReflectionPrompt, hashReflectionPrompt } from "../src/lib/reflection";
 import {
-  agentReflectionAttributes,
-  createAgentReflectionPayload,
-  createModifierStackPayload,
+  agentInsightAttributes,
+  createAgentInsightPayload,
+  createMemoryContextPayload,
   createMemoryNodePayload,
   memoryNodeAttributes,
-  modifierStackAttributes,
+  memoryContextAttributes,
 } from "../src/lib/schema";
 
 config({ path: ".env.local" });
@@ -58,79 +58,79 @@ async function main() {
   });
   console.log(`Created Memory 1 Node: ${memory1Key} (Tx: ${memory1Tx})`);
 
-  console.log("Creating ModifierStack 1 for Memory 1...");
+  console.log("Creating MemoryContext 1 for Memory 1...");
   const modifiers1 = ["expand:reasoning", "transform:concise-bullets"];
-  const stack1Payload = createModifierStackPayload({
+  const context1Payload = createMemoryContextPayload({
     memoryKey: memory1Key,
     modifiers: modifiers1,
     interpreter: DEMO_INTERPRETER,
     context: "Cognitive step-by-step logic expansion.",
     authority: DEMO_AUTHORITY,
   });
-  const { entityKey: stack1Key, txHash: stack1Tx } = await walletClient.createEntity({
-    payload: jsonToPayload(stack1Payload),
+  const { entityKey: context1Key, txHash: stack1Tx } = await walletClient.createEntity({
+    payload: jsonToPayload(context1Payload),
     contentType: "application/json",
-    attributes: modifierStackAttributes(stack1Payload),
+    attributes: memoryContextAttributes(context1Payload),
     expiresIn: DEFAULT_ENTITY_TTL_SECONDS,
   });
-  console.log(`Created ModifierStack 1: ${stack1Key} (Tx: ${stack1Tx})`);
+  console.log(`Created ModifierStack 1: ${context1Key} (Tx: ${stack1Tx})`);
 
   console.log("Generating first recursive reflection for Memory 1...");
   const prompt1 = buildReflectionPrompt({
     memoryContent: memory1Payload.content!,
     modifiers: modifiers1,
     interpreter: DEMO_INTERPRETER,
-    context: stack1Payload.context,
+    context: context1Payload.context,
     authority: DEMO_AUTHORITY,
     priorReflections: [],
   });
-  const reflection1Payload = createAgentReflectionPayload({
+  const insight1Payload = createAgentInsightPayload({
     memoryKey: memory1Key,
-    modifierStackKey: stack1Key,
+    memoryContextKey: context1Key,
     reflection: "Model evaluation: Holding competing logic states avoids early local minima optimization, reducing overall agent error rate by 14%.",
     model: "llama-3.1-8b-instant",
     interpreter: DEMO_INTERPRETER,
-    context: stack1Payload.context,
+    context: context1Payload.context,
     authority: DEMO_AUTHORITY,
     promptHash: hashReflectionPrompt(prompt1),
     lineageDepth: 0,
   });
-  const { entityKey: reflection1Key, txHash: reflection1Tx } = await walletClient.createEntity({
-    payload: jsonToPayload(reflection1Payload),
+  const { entityKey: insight1Key, txHash: reflection1Tx } = await walletClient.createEntity({
+    payload: jsonToPayload(insight1Payload),
     contentType: "application/json",
-    attributes: agentReflectionAttributes(reflection1Payload),
+    attributes: agentInsightAttributes(insight1Payload),
     expiresIn: DEFAULT_ENTITY_TTL_SECONDS,
   });
-  console.log(`Created Reflection 1 (Depth 0): ${reflection1Key} (Tx: ${reflection1Tx})`);
+  console.log(`Created Reflection 1 (Depth 0): ${insight1Key} (Tx: ${reflection1Tx})`);
 
   console.log("Generating second recursive reflection (child of Reflection 1) for Memory 1...");
   const prompt2 = buildReflectionPrompt({
     memoryContent: memory1Payload.content!,
     modifiers: modifiers1,
     interpreter: DEMO_INTERPRETER,
-    context: stack1Payload.context,
+    context: context1Payload.context,
     authority: DEMO_AUTHORITY,
-    priorReflections: [reflection1Payload.reflection!],
+    priorReflections: [insight1Payload.insight!],
   });
-  const reflection2Payload = createAgentReflectionPayload({
+  const insight2Payload = createAgentInsightPayload({
     memoryKey: memory1Key,
-    modifierStackKey: stack1Key,
+    memoryContextKey: context1Key,
     reflection: "Optimized decision workflow: Maintain contradiction state for exactly 3 feedback cycles. Group reasoning steps in secure thinking tags.",
     model: "llama-3.1-8b-instant",
     interpreter: DEMO_INTERPRETER,
-    context: stack1Payload.context,
+    context: context1Payload.context,
     authority: DEMO_AUTHORITY,
     promptHash: hashReflectionPrompt(prompt2),
     lineageDepth: 1,
-    previousReflectionKey: reflection1Key,
+    previousReflectionKey: insight1Key,
   });
-  const { entityKey: reflection2Key, txHash: reflection2Tx } = await walletClient.createEntity({
-    payload: jsonToPayload(reflection2Payload),
+  const { entityKey: insight2Key, txHash: reflection2Tx } = await walletClient.createEntity({
+    payload: jsonToPayload(insight2Payload),
     contentType: "application/json",
-    attributes: agentReflectionAttributes(reflection2Payload),
+    attributes: agentInsightAttributes(insight2Payload),
     expiresIn: DEFAULT_ENTITY_TTL_SECONDS,
   });
-  console.log(`Created Reflection 2 (Depth 1, parent: Reflection 1): ${reflection2Key} (Tx: ${reflection2Tx})`);
+  console.log(`Created Reflection 2 (Depth 1, parent: Reflection 1): ${insight2Key} (Tx: ${reflection2Tx})`);
 
 
   // Demo Memory 2: Security Compliance Log
@@ -150,50 +150,50 @@ async function main() {
   });
   console.log(`Created Memory 2 Node: ${memory2Key} (Tx: ${memory2Tx})`);
 
-  console.log("Creating ModifierStack 2 for Memory 2...");
+  console.log("Creating MemoryContext 2 for Memory 2...");
   const modifiers2 = ["route:secure-vault", "remember"];
-  const stack2Payload = createModifierStackPayload({
+  const context2Payload = createMemoryContextPayload({
     memoryKey: memory2Key,
     modifiers: modifiers2,
     interpreter: DEMO_INTERPRETER,
     context: "Audit latency metrics and compliance thresholds.",
     authority: DEMO_AUTHORITY,
   });
-  const { entityKey: stack2Key, txHash: stack2Tx } = await walletClient.createEntity({
-    payload: jsonToPayload(stack2Payload),
+  const { entityKey: context2Key, txHash: stack2Tx } = await walletClient.createEntity({
+    payload: jsonToPayload(context2Payload),
     contentType: "application/json",
-    attributes: modifierStackAttributes(stack2Payload),
+    attributes: memoryContextAttributes(context2Payload),
     expiresIn: DEFAULT_ENTITY_TTL_SECONDS,
   });
-  console.log(`Created ModifierStack 2: ${stack2Key} (Tx: ${stack2Tx})`);
+  console.log(`Created ModifierStack 2: ${context2Key} (Tx: ${stack2Tx})`);
 
   console.log("Generating reflection for Memory 2...");
   const prompt3 = buildReflectionPrompt({
     memoryContent: memory2Payload.content!,
     modifiers: modifiers2,
     interpreter: DEMO_INTERPRETER,
-    context: stack2Payload.context,
+    context: context2Payload.context,
     authority: DEMO_AUTHORITY,
     priorReflections: [],
   });
-  const reflection3Payload = createAgentReflectionPayload({
+  const insight3Payload = createAgentInsightPayload({
     memoryKey: memory2Key,
-    modifierStackKey: stack2Key,
+    memoryContextKey: context2Key,
     reflection: "Security audit compliance report: Broadcast latencies checked. 99.8% of Braga vault write actions completed inside the 500ms window.",
     model: "llama-3.1-8b-instant",
     interpreter: DEMO_INTERPRETER,
-    context: stack2Payload.context,
+    context: context2Payload.context,
     authority: DEMO_AUTHORITY,
     promptHash: hashReflectionPrompt(prompt3),
     lineageDepth: 0,
   });
-  const { entityKey: reflection3Key, txHash: reflection3Tx } = await walletClient.createEntity({
-    payload: jsonToPayload(reflection3Payload),
+  const { entityKey: insight3Key, txHash: reflection3Tx } = await walletClient.createEntity({
+    payload: jsonToPayload(insight3Payload),
     contentType: "application/json",
-    attributes: agentReflectionAttributes(reflection3Payload),
+    attributes: agentInsightAttributes(insight3Payload),
     expiresIn: DEFAULT_ENTITY_TTL_SECONDS,
   });
-  console.log(`Created Reflection 3 (Depth 0): ${reflection3Key} (Tx: ${reflection3Tx})`);
+  console.log(`Created Reflection 3 (Depth 0): ${insight3Key} (Tx: ${reflection3Tx})`);
 
 
   // Demo Memory 3: Autonomous Workflow Policy
@@ -213,50 +213,50 @@ async function main() {
   });
   console.log(`Created Memory 3 Node: ${memory3Key} (Tx: ${memory3Tx})`);
 
-  console.log("Creating ModifierStack 3 for Memory 3...");
+  console.log("Creating MemoryContext 3 for Memory 3...");
   const modifiers3 = ["expand:scientific-detail", "transform:dialogue"];
-  const stack3Payload = createModifierStackPayload({
+  const context3Payload = createMemoryContextPayload({
     memoryKey: memory3Key,
     modifiers: modifiers3,
     interpreter: DEMO_INTERPRETER,
     context: "Format limits and checks as a dialogue workflow.",
     authority: DEMO_AUTHORITY,
   });
-  const { entityKey: stack3Key, txHash: stack3Tx } = await walletClient.createEntity({
-    payload: jsonToPayload(stack3Payload),
+  const { entityKey: context3Key, txHash: stack3Tx } = await walletClient.createEntity({
+    payload: jsonToPayload(context3Payload),
     contentType: "application/json",
-    attributes: modifierStackAttributes(stack3Payload),
+    attributes: memoryContextAttributes(context3Payload),
     expiresIn: DEFAULT_ENTITY_TTL_SECONDS,
   });
-  console.log(`Created ModifierStack 3: ${stack3Key} (Tx: ${stack3Tx})`);
+  console.log(`Created ModifierStack 3: ${context3Key} (Tx: ${stack3Tx})`);
 
   console.log("Generating reflection for Memory 3...");
   const prompt4 = buildReflectionPrompt({
     memoryContent: memory3Payload.content!,
     modifiers: modifiers3,
     interpreter: DEMO_INTERPRETER,
-    context: stack3Payload.context,
+    context: context3Payload.context,
     authority: DEMO_AUTHORITY,
     priorReflections: [],
   });
-  const reflection4Payload = createAgentReflectionPayload({
+  const insight4Payload = createAgentInsightPayload({
     memoryKey: memory3Key,
-    modifierStackKey: stack3Key,
+    memoryContextKey: context3Key,
     reflection: "Architectural confirmation: Dialoguing boundary rules has been parsed. The agent will strictly refuse higher value executions without explicit wallet signing signatures.",
     model: "llama-3.1-8b-instant",
     interpreter: DEMO_INTERPRETER,
-    context: stack3Payload.context,
+    context: context3Payload.context,
     authority: DEMO_AUTHORITY,
     promptHash: hashReflectionPrompt(prompt4),
     lineageDepth: 0,
   });
-  const { entityKey: reflection4Key, txHash: reflection4Tx } = await walletClient.createEntity({
-    payload: jsonToPayload(reflection4Payload),
+  const { entityKey: insight4Key, txHash: reflection4Tx } = await walletClient.createEntity({
+    payload: jsonToPayload(insight4Payload),
     contentType: "application/json",
-    attributes: agentReflectionAttributes(reflection4Payload),
+    attributes: agentInsightAttributes(insight4Payload),
     expiresIn: DEFAULT_ENTITY_TTL_SECONDS,
   });
-  console.log(`Created Reflection 4 (Depth 0): ${reflection4Key} (Tx: ${reflection4Tx})`);
+  console.log(`Created Reflection 4 (Depth 0): ${insight4Key} (Tx: ${reflection4Tx})`);
 
   console.log("\nDemo seeding completed successfully! All entities saved to Arkiv Braga ledger.");
 }
