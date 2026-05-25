@@ -83,7 +83,7 @@ export default function Home() {
           </div>
         </div>
 
-        <MemoryGraph memory={previewMemory} stacks={[previewContext]} />
+        <MemoryGraph memory={previewMemory} contexts={[previewContext]} />
       </section>
 
       {/* How it works strip */}
