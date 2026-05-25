@@ -453,7 +453,7 @@ export function MemoryExperience() {
       const { record: createdInsight } = await createAgentInsight({
         memoryKey,
         memoryContextKey: stackKey,
-        reflection: insightText.trim(),
+        insight: insightText.trim(),
         model: generatedModel || selectedModel,
         interpreter: targetStack?.payload.interpreter,
         context: targetStack?.payload.context,
@@ -513,11 +513,11 @@ export function MemoryExperience() {
     const map = new Map<string, ArkivEntityRecord<AgentInsightPayload>[]>();
     if (!graph) return map;
     for (const insight of graph.insights) {
-      const parent = ref.payload.previousInsightKey || "root";
+      const parent = insight.payload.previousInsightKey || "root";
       if (!map.has(parent)) {
         map.set(parent, []);
       }
-      map.get(parent)!.push(ref);
+      map.get(parent)!.push(insight);
     }
     return map;
   }, [graph]);
@@ -531,30 +531,30 @@ export function MemoryExperience() {
   }, [graph]);
 
   async function handleUnlockInsight(reflection: ArkivEntityRecord<AgentInsightPayload>) {
-    const encryptedInsight = insight.payload.encryptedInsight;
+    const encryptedInsight = reflection.payload.encryptedInsight;
     if (!encryptedInsight) return;
 
-    const passphrase = insightUnlockPassphrases[insight.key]?.trim();
+    const passphrase = insightUnlockPassphrases[reflection.key]?.trim();
     if (!passphrase) {
-      setReflectionUnlockErrors((current) => ({
+      setInsightUnlockErrors((current) => ({
         ...current,
-        [insight.key]: "Enter the secret key for this thought first.",
+        [reflection.key]: "Enter the secret key for this thought first.",
       }));
       return;
     }
 
     try {
       const decrypted = await decryptString(encryptedInsight, passphrase);
-      setDecryptedReflections((current) => ({ ...current, [insight.key]: decrypted }));
-      setReflectionUnlockErrors((current) => {
+      setDecryptedInsights((current) => ({ ...current, [reflection.key]: decrypted }));
+      setInsightUnlockErrors((current) => {
         const next = { ...current };
-        delete next[insight.key];
+        delete next[reflection.key];
         return next;
       });
     } catch {
-      setReflectionUnlockErrors((current) => ({
+      setInsightUnlockErrors((current) => ({
         ...current,
-        [insight.key]: "That secret key did not unlock this thought.",
+        [reflection.key]: "That secret key did not unlock this thought.",
       }));
     }
   }
@@ -607,11 +607,11 @@ export function MemoryExperience() {
                     value={insightUnlockPassphrases[insight.key] ?? ""}
                     onChange={(event) => {
                       const nextValue = event.target.value;
-                      setReflectionUnlockPassphrases((current) => ({
+                      setInsightUnlockPassphrases((current) => ({
                         ...current,
                         [insight.key]: nextValue,
                       }));
-                      setReflectionUnlockErrors((current) => {
+                      setInsightUnlockErrors((current) => {
                         const next = { ...current };
                         delete next[insight.key];
                         return next;
@@ -621,13 +621,13 @@ export function MemoryExperience() {
                     onKeyDown={async (e) => {
                       if (e.key === "Enter") {
                         e.preventDefault();
-                        await handleUnlockInsight(reflection);
+                        await handleUnlockInsight(insight);
                       }
                     }}
                   />
                   <button
                     type="button"
-                    onClick={() => void handleUnlockInsight(reflection)}
+                    onClick={() => void handleUnlockInsight(insight)}
                     className="inline-flex items-center justify-center rounded bg-slate-900 dark:bg-slate-800 px-3 text-xs font-bold text-white dark:text-slate-100 hover:bg-slate-800 dark:hover:bg-slate-700 cursor-pointer"
                   >
                     Unlock
@@ -642,7 +642,7 @@ export function MemoryExperience() {
             )
           ) : (
             <p className="text-sm italic text-slate-700 dark:text-slate-300 mt-2">
-              &ldquo;{getReflectionDisplayText(insight.payload)}&rdquo;
+              &ldquo;{getInsightDisplayText(insight.payload)}&rdquo;
             </p>
           )}
           <div className="mt-4 grid gap-1 border-t border-slate-100 dark:border-slate-800/80 pt-3 text-xs text-slate-500 dark:text-slate-400">
@@ -668,7 +668,7 @@ export function MemoryExperience() {
                 Reply
               </button>
               <a
-                href={`/create?content=${encodeURIComponent(getReflectionDisplayText(insight.payload))}&title=Reflection-${insight.key.slice(2, 10)}&domain=${encodeURIComponent(graph?.memory.payload.domain || "")}`}
+                href={`/create?content=${encodeURIComponent(getInsightDisplayText(insight.payload))}&title=Reflection-${insight.key.slice(2, 10)}&domain=${encodeURIComponent(graph?.memory.payload.domain || "")}`}
                 title="Turn this thought into a brand new core memory"
                 className="inline-flex items-center gap-1 font-bold text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:underline"
               >
@@ -844,7 +844,7 @@ export function MemoryExperience() {
                       {wallet ? (
                         <button
                           type="button"
-                          onClick={() => void handleCreateDefaultStack()}
+                          onClick={() => void handleCreateDefaultContext()}
                           disabled={isCreatingContext}
                           className="inline-flex h-11 w-fit items-center justify-center gap-2 rounded-lg bg-slate-950 dark:bg-slate-800 px-5 text-sm font-black text-white dark:text-slate-100 transition hover:-translate-y-0.5 hover:bg-slate-800 dark:hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
                         >
@@ -919,8 +919,8 @@ export function MemoryExperience() {
                       <label className="grid gap-2 text-sm font-bold text-slate-700 dark:text-slate-300">
                         <span>Choose a lens (Thought Layer)</span>
                         <select
-                          value={effectiveSelectedStackKey}
-                          onChange={(e) => setSelectedStackKey(e.target.value)}
+                          value={effectiveSelectedContextKey}
+                          onChange={(e) => setSelectedContextKey(e.target.value)}
                           className="input"
                           required
                         >

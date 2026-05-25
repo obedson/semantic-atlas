@@ -49,6 +49,7 @@ import {
   type MemoryNodePayload,
   type MemoryContextPayload,
   type SemanticAtlasPayload,
+  type ModifierVaultPayload,
   type Visibility,
 } from "./schema";
 
