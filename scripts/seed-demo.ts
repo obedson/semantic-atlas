@@ -87,7 +87,7 @@ async function main() {
   const insight1Payload = createAgentInsightPayload({
     memoryKey: memory1Key,
     memoryContextKey: context1Key,
-    reflection: "Model evaluation: Holding competing logic states avoids early local minima optimization, reducing overall agent error rate by 14%.",
+    insight: "Model evaluation: Holding competing logic states avoids early local minima optimization, reducing overall agent error rate by 14%.",
     model: "llama-3.1-8b-instant",
     interpreter: DEMO_INTERPRETER,
     context: context1Payload.context,
@@ -115,7 +115,7 @@ async function main() {
   const insight2Payload = createAgentInsightPayload({
     memoryKey: memory1Key,
     memoryContextKey: context1Key,
-    reflection: "Optimized decision workflow: Maintain contradiction state for exactly 3 feedback cycles. Group reasoning steps in secure thinking tags.",
+    insight: "Optimized decision workflow: Maintain contradiction state for exactly 3 feedback cycles. Group reasoning steps in secure thinking tags.",
     model: "llama-3.1-8b-instant",
     interpreter: DEMO_INTERPRETER,
     context: context1Payload.context,
@@ -179,7 +179,7 @@ async function main() {
   const insight3Payload = createAgentInsightPayload({
     memoryKey: memory2Key,
     memoryContextKey: context2Key,
-    reflection: "Security audit compliance report: Broadcast latencies checked. 99.8% of Braga vault write actions completed inside the 500ms window.",
+    insight: "Security audit compliance report: Broadcast latencies checked. 99.8% of Braga vault write actions completed inside the 500ms window.",
     model: "llama-3.1-8b-instant",
     interpreter: DEMO_INTERPRETER,
     context: context2Payload.context,
@@ -242,7 +242,7 @@ async function main() {
   const insight4Payload = createAgentInsightPayload({
     memoryKey: memory3Key,
     memoryContextKey: context3Key,
-    reflection: "Architectural confirmation: Dialoguing boundary rules has been parsed. The agent will strictly refuse higher value executions without explicit wallet signing signatures.",
+    insight: "Architectural confirmation: Dialoguing boundary rules has been parsed. The agent will strictly refuse higher value executions without explicit wallet signing signatures.",
     model: "llama-3.1-8b-instant",
     interpreter: DEMO_INTERPRETER,
     context: context3Payload.context,
