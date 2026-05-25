@@ -331,20 +331,20 @@ export function MemoryExperience() {
       if (createdContext) {
         setGraph((current) => {
           if (!current) return null;
-          if (current.stacks.some((s) => s.key === createdContext.key)) {
+          if (current.contexts.some((s) => s.key === createdContext.key)) {
             return current;
           }
 
           return {
             ...current,
-            stacks: [createdContext, ...current.stacks],
+            contexts: [createdContext, ...current.contexts],
           };
         });
       }
     } catch (err) {
       setContextError(err instanceof Error ? err.message : "Could not set up a lens for this memory.");
     } finally {
-      setIsCreatingStack(false);
+      setIsCreatingContext(false);
     }
   };
 
