@@ -122,7 +122,7 @@ async function main() {
     authority: DEMO_AUTHORITY,
     promptHash: hashReflectionPrompt(prompt2),
     lineageDepth: 1,
-    previousReflectionKey: insight1Key,
+    previousInsightKey: insight1Key,
   });
   const { entityKey: insight2Key, txHash: reflection2Tx } = await walletClient.createEntity({
     payload: jsonToPayload(insight2Payload),
