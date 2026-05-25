@@ -229,45 +229,6 @@ export function MemoryExperience() {
     }
   }, [graph?.insights, decryptPassphrase, memoryKey, getPassphrase, decryptAllInsights]);
 
-  useEffect(() => {
-    let isMounted = true;
-
-    void getConnectedWallet()
-      .then((existingConnection) => {
-        if (isMounted) {
-          setWallet(existingConnection);
-        }
-      })
-      .catch(() => {
-        if (isMounted) {
-          setWallet(null);
-        }
-      });
-
-    let unwatch: (() => void) | undefined;
-    try {
-      unwatch = watchWalletConnection((nextConnection) => {
-        if (isMounted) {
-          setWallet(nextConnection);
-        }
-      });
-    } catch {
-      unwatch = undefined;
-    }
-
-    const unwatchProviders = watchDiscoveredProviders((nextProviders) => {
-      if (isMounted) {
-        setProviders(nextProviders);
-      }
-    });
-
-    return () => {
-      isMounted = false;
-      unwatch?.();
-      unwatchProviders();
-    };
-  }, []);
-
   const loadGraph = useCallback(async (options?: { silent?: boolean }) => {
     if (!options?.silent) {
       setIsLoading(true);
