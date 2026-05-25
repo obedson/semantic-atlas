@@ -56,10 +56,14 @@ export function createCodeMemory(input: {
   code_diff?: string;
 }): CodeMemoryPayload {
   return {
+    entityType: "MemoryNode",
+    project: "semantic_atlas_v1",
     content: input.content,
+    title: input.change_description,
     domain: input.file_path.split("/")[0] || "root",
     visibility: "private",
     contentMode: "plaintext",
+    createdAt: new Date().toISOString(),
     file_path: input.file_path,
     language: input.language,
     framework: input.framework,
@@ -78,6 +82,8 @@ export function createCodeContext(input: {
   related_files?: string[];
 }): CodeContextPayload {
   return {
+    entityType: "MemoryContext",
+    project: "semantic_atlas_v1",
     memoryKey: input.memoryKey,
     context: input.reason,
     interpreter: "code-analyzer-v1",
@@ -100,6 +106,8 @@ export function createCodeInsight(input: {
   model: string;
 }): CodeInsightPayload {
   return {
+    entityType: "AgentInsight",
+    project: "semantic_atlas_v1",
     memoryKey: input.memoryKey,
     memoryContextKey: input.memoryContextKey,
     insight: input.understanding,
