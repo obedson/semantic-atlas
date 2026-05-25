@@ -203,9 +203,9 @@ export function MemoryExperience() {
         decryptString(graph.memory.payload.encryptedContent, cached)
           .then((decrypted) => {
             setDecryptedMemory(decrypted);
-            setEncryptReflection(true);
-            setReflectionPassphrase(cached);
-            void decryptAllReflections(graph.insights, cached);
+            setEncryptInsight(true);
+            setInsightPassphrase(cached);
+            void decryptAllInsights(graph.insights, cached);
           })
           .catch(() => {
             // cached key invalid or expired
@@ -215,7 +215,7 @@ export function MemoryExperience() {
           });
       }
     }
-  }, [memoryKey, graph, getPassphrase, decryptedMemory, isDecrypting, decryptAllReflections]);
+  }, [memoryKey, graph, getPassphrase, decryptedMemory, isDecrypting, decryptAllInsights]);
 
   // Auto-decrypt reflections when graph changes
   useEffect(() => {
@@ -223,11 +223,11 @@ export function MemoryExperience() {
       const activePassphrase = decryptPassphrase || getPassphrase(memoryKey) || "";
       if (activePassphrase) {
         Promise.resolve().then(() => {
-          void decryptAllReflections(graph.insights, activePassphrase);
+          void decryptAllInsights(graph.insights, activePassphrase);
         });
       }
     }
-  }, [graph?.reflections, decryptPassphrase, memoryKey, getPassphrase, decryptAllReflections]);
+  }, [graph?.reflections, decryptPassphrase, memoryKey, getPassphrase, decryptAllInsights]);
 
   useEffect(() => {
     let isMounted = true;
@@ -395,12 +395,12 @@ export function MemoryExperience() {
     try {
       const decrypted = await decryptString(graph.memory.payload.encryptedContent, decryptPassphrase);
       setDecryptedMemory(decrypted);
-      setEncryptReflection(true);
+      setEncryptInsight(true);
       if (!insightPassphrase) {
-        setReflectionPassphrase(decryptPassphrase);
+        setInsightPassphrase(decryptPassphrase);
       }
       setPassphrase(memoryKey, decryptPassphrase);
-      void decryptAllReflections(graph.insights, decryptPassphrase);
+      void decryptAllInsights(graph.insights, decryptPassphrase);
     } catch (err) {
       setDecryptError(err instanceof Error ? err.message : "Could not unlock memory. Please check your secret key.");
       setDecryptedMemory("");
@@ -486,7 +486,7 @@ export function MemoryExperience() {
       const encryptedInsight = encryptInsight
         ? await encryptString(insightText.trim(), insightPassphrase)
         : undefined;
-      const reflectionContentMode: ContentMode = encryptInsight ? "encrypted" : "plaintext";
+      const insightContentMode: ContentMode = encryptInsight ? "encrypted" : "plaintext";
 
       setTxStep("broadcasting");
       const { record: createdInsight } = await createAgentInsight({
@@ -497,7 +497,7 @@ export function MemoryExperience() {
         interpreter: targetStack?.payload.interpreter,
         context: targetStack?.payload.context,
         authority: targetStack?.payload.authority,
-        contentMode: reflectionContentMode,
+        contentMode: insightContentMode,
         encryptedInsight,
         previousInsightKey: replyToKey,
         lineageDepth: replyToKey ? (graph.insights.find(r => r.key === replyToKey)?.payload.lineageDepth ?? 0) + 1 : 0,
@@ -548,7 +548,7 @@ export function MemoryExperience() {
     URL.revokeObjectURL(url);
   };
 
-  const reflectionsByParent = useMemo(() => {
+  const insightsByParent = useMemo(() => {
     const map = new Map<string, ArkivEntityRecord<AgentInsightPayload>[]>();
     if (!graph) return map;
     for (const insight of graph.insights) {
@@ -561,7 +561,7 @@ export function MemoryExperience() {
     return map;
   }, [graph]);
 
-  const rootReflections = useMemo(() => {
+  const rootInsights = useMemo(() => {
     if (!graph) return [];
     const keys = new Set(graph.insights.map((r) => r.key));
     return graph.insights.filter(
@@ -602,7 +602,7 @@ export function MemoryExperience() {
     insight: ArkivEntityRecord<AgentInsightPayload>,
     depth: number = 0
   ) => {
-    const children = reflectionsByParent.get(insight.key) || [];
+    const children = insightsByParent.get(insight.key) || [];
     const sortedChildren = [...children].sort(
       (a, b) => new Date(a.payload.createdAt).getTime() - new Date(b.payload.createdAt).getTime()
     );
@@ -1111,7 +1111,7 @@ export function MemoryExperience() {
                         <input
                           type="checkbox"
                           checked={encryptInsight}
-                          onChange={(event) => setEncryptReflection(event.target.checked)}
+                          onChange={(event) => setEncryptInsight(event.target.checked)}
                           className="h-4 w-4"
                         />
                         Keep this thought private
@@ -1120,7 +1120,7 @@ export function MemoryExperience() {
                         <input
                           type="password"
                           value={insightPassphrase}
-                          onChange={(event) => setReflectionPassphrase(event.target.value)}
+                          onChange={(event) => setInsightPassphrase(event.target.value)}
                           className="input"
                           placeholder="Secret key for this thought"
                           autoComplete="new-password"
@@ -1265,7 +1265,7 @@ export function MemoryExperience() {
                 <p className="mt-3 text-sm text-slate-500 dark:text-slate-400 italic">No thoughts recorded yet. Use the form above to save the first interpretation!</p>
               ) : (
                 <div className="mt-4 space-y-4">
-                  {rootReflections.map((root) => renderReflectionNode(root, 0))}
+                  {rootInsights.map((root) => renderReflectionNode(root, 0))}
                 </div>
               )}
             </article>
