@@ -379,9 +379,9 @@ export function MemoryExperience() {
       return;
     }
 
-    setIsGeneratingReflection(true);
+    setIsGeneratingInsight(true);
     setInsightError(null);
-    setReflectionSuccess(false);
+    setInsightSuccess(false);
 
     try {
       const response = await fetch("/api/reflections/generate", {
@@ -422,7 +422,7 @@ export function MemoryExperience() {
     } catch (err) {
       setInsightError(err instanceof Error ? err.message : "AgentInsight generation failed.");
     } finally {
-      setIsGeneratingReflection(false);
+      setIsGeneratingInsight(false);
     }
   };
 
@@ -434,7 +434,7 @@ export function MemoryExperience() {
     setIsSubmittingReflection(true);
     setTxStep("payload");
     setInsightError(null);
-    setReflectionSuccess(false);
+    setInsightSuccess(false);
 
     try {
       if (encryptInsight && !insightPassphrase.trim()) {
@@ -476,7 +476,7 @@ export function MemoryExperience() {
           insights: [createdInsight, ...current.insights],
         };
       });
-      setReflectionSuccess(true);
+      setInsightSuccess(true);
       setInsightText("");
       setSelectedPersona("custom");
       setPromptHash(undefined);
