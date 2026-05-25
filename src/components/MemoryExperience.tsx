@@ -431,7 +431,7 @@ export function MemoryExperience() {
     const stackKey = selectedContextKey || graph?.contexts[0]?.key;
     if (!graph || !stackKey) return;
     
-    setIsSubmittingReflection(true);
+    setIsSubmittingInsight(true);
     setTxStep("payload");
     setInsightError(null);
     setInsightSuccess(false);
@@ -485,7 +485,7 @@ export function MemoryExperience() {
     } catch (err) {
       setInsightError(err instanceof Error ? err.message : "We couldn't save this thought to the blockchain. Please check your wallet connection.");
     } finally {
-      setIsSubmittingReflection(false);
+      setIsSubmittingInsight(false);
       setTxStep("idle");
     }
   };
