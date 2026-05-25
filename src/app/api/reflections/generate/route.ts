@@ -99,17 +99,17 @@ export async function POST(request: Request) {
   }
 
   const data = (await response.json()) as GroqChatResponse;
-  const reflection = data.choices?.[0]?.message?.content?.trim();
+  const insight = data.choices?.[0]?.message?.content?.trim();
 
-  if (!reflection) {
+  if (!insight) {
     return NextResponse.json(
-      { error: "Groq returned an empty AgentReflection." },
+      { error: "Groq returned an empty AgentInsight." },
       { status: 502 },
     );
   }
 
   return NextResponse.json({
-    reflection,
+    insight,
     promptHash,
     model,
     interpreter: body.interpreter,

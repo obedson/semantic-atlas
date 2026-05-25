@@ -435,25 +435,25 @@ export function MemoryExperience() {
           context: selectedContext.payload.context,
           authority: selectedContext.payload.authority,
           priorReflections: graph.insights
-            .map((reflection) => getReflectionDisplayText(insight.payload))
-            .filter((reflection) => !reflection.startsWith("Encrypted"))
+            .map((insight) => getInsightDisplayText(insight.payload))
+            .filter((text) => !text.startsWith("Encrypted"))
             .slice(0, 5),
           customPrompt: customPromptText !== defaultPrompt ? customPromptText : undefined,
         }),
       });
 
       const data = (await response.json()) as {
-        reflection?: string;
+        insight?: string;
         promptHash?: string;
         model?: string;
         error?: string;
       };
 
-      if (!response.ok || !data.reflection) {
+      if (!response.ok || !data.insight) {
         throw new Error(data.error ?? "We couldn't generate a thought for you.");
       }
 
-      setReflectionText(data.reflection);
+      setReflectionText(data.insight);
       setPromptHash(data.promptHash);
       setGeneratedModel(data.model ?? "groq");
       setSelectedModel(data.model ?? "groq");
@@ -506,13 +506,13 @@ export function MemoryExperience() {
 
       setGraph((current) => {
         if (!current) return current;
-        if (current.reflections.some((reflection) => insight.key === createdInsight.key)) {
+        if (current.insights.some((existingInsight) => existingInsight.key === createdInsight.key)) {
           return current;
         }
 
         return {
           ...current,
-          reflections: [createdInsight, ...current.reflections],
+          insights: [createdInsight, ...current.insights],
         };
       });
       setReflectionSuccess(true);
@@ -599,7 +599,7 @@ export function MemoryExperience() {
   }
 
   const renderReflectionNode = (
-    reflection: ArkivEntityRecord<AgentInsightPayload>,
+    insight: ArkivEntityRecord<AgentInsightPayload>,
     depth: number = 0
   ) => {
     const children = reflectionsByParent.get(insight.key) || [];
@@ -782,8 +782,8 @@ export function MemoryExperience() {
         <>
           <MemoryGraph
             memory={graph.memory}
-            stacks={graph.contexts}
-            reflections={graph.insights}
+            contexts={graph.contexts}
+            insights={graph.insights}
           />
 
           <section className="grid gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(360px,0.8fr)]">
