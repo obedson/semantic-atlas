@@ -217,9 +217,9 @@ export function MemoryExperience() {
     }
   }, [memoryKey, graph, getPassphrase, decryptedMemory, isDecrypting, decryptAllInsights]);
 
-  // Auto-decrypt reflections when graph changes
+  // Auto-decrypt insights when graph changes
   useEffect(() => {
-    if (graph?.reflections) {
+    if (graph?.insights) {
       const activePassphrase = decryptPassphrase || getPassphrase(memoryKey) || "";
       if (activePassphrase) {
         Promise.resolve().then(() => {
@@ -227,7 +227,7 @@ export function MemoryExperience() {
         });
       }
     }
-  }, [graph?.reflections, decryptPassphrase, memoryKey, getPassphrase, decryptAllInsights]);
+  }, [graph?.insights, decryptPassphrase, memoryKey, getPassphrase, decryptAllInsights]);
 
   useEffect(() => {
     let isMounted = true;
