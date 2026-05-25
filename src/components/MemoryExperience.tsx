@@ -295,9 +295,9 @@ export function MemoryExperience() {
   };
 
   const availableProviders = () => {
-    const legacy = getLegacyProvider();
-    const allProviders = [...providers];
-    if (legacy && !providers.some((p) => p.rdns === legacy.rdns || p.name === legacy.name)) {
+    const legacy = wallet.legacyProvider;
+    const allProviders = [...wallet.providers];
+    if (legacy && !wallet.providers.some((p) => p.rdns === legacy.rdns || p.name === legacy.name)) {
       allProviders.push(legacy);
     }
     return allProviders;
@@ -305,19 +305,19 @@ export function MemoryExperience() {
 
   const handleConnectProvider = async (providerUuid: string) => {
     setInsightError(null);
-    setStackError(null);
+    setContextError(null);
 
     try {
-      await connectWallet(providerUuid);
+      await wallet.connect(providerUuid);
     } catch (err) {
       setInsightError(err instanceof Error ? err.message : "Could not connect your wallet.");
     }
   };
 
-  const handleCreateDefaultStack = async () => {
+  const handleCreateDefaultContext = async () => {
     if (!graph) return;
-    setIsCreatingStack(true);
-    setStackError(null);
+    setIsCreatingContext(true);
+    setContextError(null);
 
     try {
       const { record: createdContext } = await createMemoryContext({
@@ -342,7 +342,7 @@ export function MemoryExperience() {
         });
       }
     } catch (err) {
-      setStackError(err instanceof Error ? err.message : "Could not set up a lens for this memory.");
+      setContextError(err instanceof Error ? err.message : "Could not set up a lens for this memory.");
     } finally {
       setIsCreatingStack(false);
     }
