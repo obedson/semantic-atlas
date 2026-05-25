@@ -16,7 +16,7 @@ import {
   PROJECT_ATTRIBUTE,
   SCHEMA_VERSION,
 } from "@/lib/constants";
-import type { ArkivEntityRecord, MemoryNodePayload, ModifierStackPayload } from "@/lib/schema";
+import type { ArkivEntityRecord, MemoryNodePayload, MemoryContextPayload } from "@/lib/schema";
 
 export default function Home() {
   const previewMemoryKey = "preview-memory-key";
@@ -36,10 +36,10 @@ export default function Home() {
     attributes: [],
   };
 
-  const previewStack: Partial<ArkivEntityRecord<ModifierStackPayload>> = {
-    key: "preview-stack-key",
+  const previewContext: Partial<ArkivEntityRecord<MemoryContextPayload>> = {
+    key: "preview-context-key",
     payload: {
-      entityType: "ModifierStack" as const,
+      entityType: "MemoryContext" as const,
       project: PROJECT_ATTRIBUTE,
       schemaVersion: SCHEMA_VERSION,
       memoryKey: previewMemoryKey,
@@ -83,7 +83,7 @@ export default function Home() {
           </div>
         </div>
 
-        <MemoryGraph memory={previewMemory} stacks={[previewStack]} />
+        <MemoryGraph memory={previewMemory} stacks={[previewContext]} />
       </section>
 
       {/* How it works strip */}
