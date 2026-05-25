@@ -288,9 +288,9 @@ export function MemoryExperience() {
     setSelectedPersona(personaId);
     const persona = REFLECTION_PERSONAS.find((p) => p.id === personaId);
     if (persona && personaId !== "custom") {
-      setReflectionText(persona.text);
+      setInsightText(persona.text);
     } else if (personaId === "custom") {
-      setReflectionText("");
+      setInsightText("");
     }
   };
 
@@ -414,7 +414,7 @@ export function MemoryExperience() {
         throw new Error(data.error ?? "We couldn't generate a thought for you.");
       }
 
-      setReflectionText(data.insight);
+      setInsightText(data.insight);
       setPromptHash(data.promptHash);
       setGeneratedModel(data.model ?? "groq");
       setSelectedModel(data.model ?? "groq");
@@ -477,7 +477,7 @@ export function MemoryExperience() {
         };
       });
       setReflectionSuccess(true);
-      setReflectionText("");
+      setInsightText("");
       setSelectedPersona("custom");
       setPromptHash(undefined);
       setReplyToKey(undefined);
@@ -1058,7 +1058,7 @@ export function MemoryExperience() {
                       <textarea
                         value={insightText}
                         onChange={(e) => {
-                          setReflectionText(e.target.value);
+                          setInsightText(e.target.value);
                           setSelectedPersona("custom");
                         }}
                         className="input min-h-24 font-mono text-sm"
